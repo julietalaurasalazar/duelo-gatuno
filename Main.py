@@ -1,4 +1,6 @@
 import pygame
+import sys
+import Jugador
 
 # Inicializar Pygame
 pygame.init()
@@ -29,6 +31,9 @@ clock = pygame.time.Clock()
 
 # Bucle principal
 running = True
+
+jugador = Jugador.Jugador("Gatito")
+
 while running:
     current_time = pygame.time.get_ticks()
 
@@ -54,8 +59,13 @@ while running:
         y = SCREEN_HEIGHT // 2 - int(radius)
         screen.blit(scaled_area, (x, y))
 
+    #Dibujar el personaje
+    jugador.mostrar(screen)
+    pygame.display.update()
+
     # Actualizar pantalla
     pygame.display.flip()
     clock.tick(60)
 
 pygame.quit()
+sys.exit()

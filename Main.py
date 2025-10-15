@@ -20,29 +20,31 @@ area_image = pygame.image.load("area.png").convert_alpha()
 
 # Radio inicial del área
 max_radius = min(SCREEN_WIDTH, SCREEN_HEIGHT)
-radius = float(max_radius/1.5)
+radius = float(max_radius / 1.5)
 
 # Tiempo de achicamiento
-shrink_interval = 5000  # 10 segundos en milisegundos
+shrink_interval = 5000
 last_shrink_time = pygame.time.get_ticks()
 
 # Reloj para controlar FPS
 clock = pygame.time.Clock()
 
-# Bucle principal
-running = True
-
-# Intentar mostrar el menú solo si existe el módulo `menu`
+# Mostrar menú
 try:
     import menu
-    menu.mostrar_menu(screen, background_image, SCREEN_WIDTH, SCREEN_HEIGHT)
+    modo_juego = menu.mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
 except ImportError:
-    # No hay módulo menu; continuar sin mostrar menú
-    pass
+    modo_juego = "uno"
 
-jugador = Jugador.Jugador("Gatito")
-proyectiles = []  # lista de proyectiles
+# Crear jugadores
+jugador1 = Jugador.Jugador("Gatito")
+jugador2 = Jugador.Jugador("Perrito") if modo_juego == "dos" else None
 
+# Lista de proyectiles
+proyectiles = []
+
+# Bucle principal
+running = True
 while running:
     current_time = pygame.time.get_ticks()
 
@@ -50,82 +52,100 @@ while running:
         if event.type == pygame.QUIT or (
             event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             running = False
-        # Disparar con barra espaciadora
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            proyectiles.append(jugador.lanzar_proyectil())
 
-    # Dibujar fondo primero
+        # Disparo jugador 1
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            proyectiles.append(jugador1.lanzar_proyectil())
+
+        # Disparo jugador 2
+        if jugador2 and event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+            proyectiles.append(jugador2.lanzar_proyectil())
+
+    # Dibujar fondo
     screen.blit(background_image, (0, 0))
 
-    # Movimiento del jugador
+    # Obtener teclas presionadas
     keys = pygame.key.get_pressed()
-    dx = dy = 0
-    velocidad = jugador.velocidad
 
-    if keys[pygame.K_LEFT]:
-        dx -= 1
-    if keys[pygame.K_RIGHT]:
-        dx += 1
-    if keys[pygame.K_UP]:
-        dy -= 1
-    if keys[pygame.K_DOWN]:
-        dy += 1
+    # Movimiento jugador 1
+    dx1 = dy1 = 0
+    if keys[pygame.K_LEFT]: dx1 -= 1
+    if keys[pygame.K_RIGHT]: dx1 += 1
+    if keys[pygame.K_UP]: dy1 -= 1
+    if keys[pygame.K_DOWN]: dy1 += 1
+    if dx1 or dy1:
+        mag1 = (dx1**2 + dy1**2)**0.5
+        dx1 = dx1 / mag1 * jugador1.velocidad
+        dy1 = dy1 / mag1 * jugador1.velocidad
+    jugador1.mover(dx1, dy1)
 
-    if dx != 0 or dy != 0:
-        magnitud = (dx**2 + dy**2) ** 0.5
-        dx = dx / magnitud * velocidad
-        dy = dy / magnitud * velocidad
+    # Movimiento jugador 2
+    if jugador2:
+        dx2 = dy2 = 0
+        if keys[pygame.K_a]: dx2 -= 1
+        if keys[pygame.K_d]: dx2 += 1
+        if keys[pygame.K_w]: dy2 -= 1
+        if keys[pygame.K_s]: dy2 += 1
+        if dx2 or dy2:
+            mag2 = (dx2**2 + dy2**2)**0.5
+            dx2 = dx2 / mag2 * jugador2.velocidad
+            dy2 = dy2 / mag2 * jugador2.velocidad
+        jugador2.mover(dx2, dy2)
 
-    jugador.mover(dx, dy)
-
-    # Verificar si el jugador está dentro del área circular
+    # Verificar si los jugadores están dentro del área
     centro_area = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-    jugador_centro = jugador.rect.center
-    distancia = ((jugador_centro[0] - centro_area[0]) ** 2 + (jugador_centro[1] - centro_area[1]) ** 2) ** 0.5
 
-    if distancia > radius:
-        jugador.vida -= 1
-        if jugador.vida < 0:
-            jugador.vida = 0
+    for j in [jugador1, jugador2] if jugador2 else [jugador1]:
+        centro = j.rect.center
+        distancia = ((centro[0] - centro_area[0])**2 + (centro[1] - centro_area[1])**2)**0.5
+        if distancia > radius:
+            j.vida -= 1
+            if j.vida < 0:
+                j.vida = 0
 
-    # Mostrar vida del jugador
-    font = pygame.font.SysFont(None, 36)
-    vida_texto = font.render(f"Vida: {jugador.vida}", True, (255, 0, 0))
-    screen.blit(vida_texto, (20, 20))
-
-    # Achicar el área cada 10 segundos
+    # Achicar el área
     if current_time - last_shrink_time >= shrink_interval and radius > 0:
         radius -= 20
-        if radius < 0:
-            radius = 0
+        radius = max(radius, 0)
         last_shrink_time = current_time
 
-    # Dibujar área si el radio es mayor a 0
+    # Dibujar área
     if radius > 0:
         scaled_area = pygame.transform.scale(area_image, (int(radius * 2), int(radius * 2)))
         x = SCREEN_WIDTH // 2 - int(radius)
         y = SCREEN_HEIGHT // 2 - int(radius)
         screen.blit(scaled_area, (x, y))
 
-    # Dibujar el personaje
-    jugador.mostrar(screen)
+    # Dibujar jugadores
+    jugador1.mostrar(screen)
+    if jugador2:
+        jugador2.mostrar(screen)
 
-    # Mover y mostrar proyectiles; borrar fuera de pantalla
+    # Mover y mostrar proyectiles
     for p in proyectiles[:]:
         p.mover()
         p.mostrar(screen)
         if p.rect.right < 0 or p.rect.left > SCREEN_WIDTH:
             proyectiles.remove(p)
 
-    # Verificar si el jugador murió
-    if jugador.vida <= 0:
-        game_over_font = pygame.font.SysFont(None, 72)
-        game_over_text = game_over_font.render("GAME OVER", True, (255, 0, 0))
-        screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50))
-        pygame.display.flip()
-        pygame.time.delay(3000)
-        running = False
+    # Verificar si algún jugador murió
+    for j in [jugador1, jugador2] if jugador2 else [jugador1]:
+        if j.vida <= 0:
+            game_over_font = pygame.font.SysFont(None, 72)
+            game_over_text = game_over_font.render("GAME OVER", True, (255, 0, 0))
+            screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50))
+            pygame.display.flip()
+            pygame.time.delay(3000)
+            running = False
+            break
 
+    # Mostrar vidas
+    font = pygame.font.SysFont(None, 36)
+    vida1 = font.render(f"Vida Gatito: {jugador1.vida}", True, (255, 0, 0))
+    screen.blit(vida1, (20, 20))
+    if jugador2:
+        vida2 = font.render(f"Vida Perrito: {jugador2.vida}", True, (0, 0, 255))
+        screen.blit(vida2, (SCREEN_WIDTH - vida2.get_width() - 20, 20))
     pygame.display.update()
     clock.tick(60)
 

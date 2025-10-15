@@ -1,6 +1,7 @@
 import pygame
 import sys
 import Jugador
+import menu
 
 # Inicializar Pygame
 pygame.init()
@@ -32,6 +33,7 @@ clock = pygame.time.Clock()
 # Bucle principal
 running = True
 
+menu.mostrar_menu(screen, background_image, SCREEN_WIDTH, SCREEN_HEIGHT)
 jugador = Jugador.Jugador("Gatito")
 
 while running:

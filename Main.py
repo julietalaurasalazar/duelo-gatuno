@@ -32,7 +32,14 @@ clock = pygame.time.Clock()
 # Bucle principal
 running = True
 
-menu.mostrar_menu(screen, background_image, SCREEN_WIDTH, SCREEN_HEIGHT)
+# Intentar mostrar el menú solo si existe el módulo `menu`
+try:
+    import menu
+    menu.mostrar_menu(screen, background_image, SCREEN_WIDTH, SCREEN_HEIGHT)
+except ImportError:
+    # No hay módulo menu; continuar sin mostrar menú
+    pass
+
 jugador = Jugador.Jugador("Gatito")
 proyectiles = []  # lista de proyectiles
 

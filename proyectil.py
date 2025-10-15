@@ -5,15 +5,20 @@ class Proyectil:
         imagen_original = pygame.image.load("proyectil.png")
         self.imagen = pygame.transform.scale(imagen_original, (32, 32))
         self.velocidad = 10
-        self.posicion = [x, y]
-        self.direccion = direccion  # 1 para derecha, -1 para izquierda
+        self.posicion = [float(x), float(y)]
+        # direccion debe ser una instancia de Direccion (enum) con .vector -> (vx, vy)
+        self.direccion = direccion
+        self.vector = direccion.vector
 
         self.rect = self.imagen.get_rect()
-        self.rect.topleft = self.posicion
+        # centrar el rect en la posición inicial
+        self.rect.center = (int(self.posicion[0]), int(self.posicion[1]))
 
     def mover(self):
-        self.posicion[0] += self.velocidad * self.direccion
-        self.rect.topleft = self.posicion
+        # mover en ambas componentes usando el vector del enum
+        self.posicion[0] += self.velocidad * self.vector[0]
+        self.posicion[1] += self.velocidad * self.vector[1]
+        self.rect.center = (int(self.posicion[0]), int(self.posicion[1]))
 
     def mostrar(self, screen):
         screen.blit(self.imagen, self.rect)

@@ -1,6 +1,7 @@
 import pygame
 import sys
 import Jugador
+import proyectil
 
 # Inicializar Pygame
 pygame.init()
@@ -33,6 +34,7 @@ clock = pygame.time.Clock()
 running = True
 
 jugador = Jugador.Jugador("Gatito")
+proyectiles = []  # lista de proyectiles
 
 while running:
     current_time = pygame.time.get_ticks()
@@ -41,6 +43,9 @@ while running:
         if event.type == pygame.QUIT or (
             event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             running = False
+        # Disparar con barra espaciadora
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            proyectiles.append(jugador.lanzar_proyectil())
 
     # Dibujar fondo primero
     screen.blit(background_image, (0, 0))
@@ -97,6 +102,13 @@ while running:
 
     # Dibujar el personaje
     jugador.mostrar(screen)
+
+    # Mover y mostrar proyectiles; borrar fuera de pantalla
+    for p in proyectiles[:]:
+        p.mover()
+        p.mostrar(screen)
+        if p.rect.right < 0 or p.rect.left > SCREEN_WIDTH:
+            proyectiles.remove(p)
 
     # Verificar si el jugador murió
     if jugador.vida <= 0:

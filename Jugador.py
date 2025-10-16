@@ -1,6 +1,7 @@
 import pygame
 import proyectil
 from direccion import Direccion
+import math
 
 class Jugador:
     def __init__(self, nombre):
@@ -38,19 +39,34 @@ class Jugador:
 
             new_dir = mapping.get((sx, sy), self.direccion)
             if new_dir != self.direccion:
-                # actualizar direccion y voltear imagen si corresponde
+                # actualizar direccion y rotar/transformar imagen según la nueva dirección
+                # NOTA: Norte y Sur deben conservar la última transformación visual.
+                center = self.rect.center
                 self.direccion = new_dir
-                # conservar la posición visual antes de cambiar rect
-                topleft = self.rect.topleft
-                if self.direccion.vector[0] < 0:
-                    # si va hacia la izquierda, invertir horizontalmente
+
+                if self.direccion in (Direccion.N, Direccion.S):
+                    # mantener self.imagen tal como estaba (conservar última rotación)
+                    pass
+                elif self.direccion == Direccion.W:
+                    # Oeste: flip horizontal de la base
                     self.imagen = pygame.transform.flip(self.base_image, True, False)
+                elif self.direccion in (Direccion.NW, Direccion.SW):
+                    # Noroeste / Suroeste: primero flip horizontal la base (para mirar oeste),
+                    # luego rotar esa imagen para inclinarla hacia la diagonal correcta.
+                    vx, vy = self.direccion.vector
+                    angle_deg = math.degrees(math.atan2(-vy, vx))
+                    flipped_base = pygame.transform.flip(self.base_image, True, False)
+                    # restar 180° de la rotación calculada (porque partimos de la imagen volteada)
+                    self.imagen = pygame.transform.rotate(flipped_base, angle_deg - 180)
                 else:
-                    # hacia la derecha: imagen normal
-                    self.imagen = self.base_image
-                # reconstruir rect y mantener topleft
+                    # Este, NE y SE: rotación igual que en proyectil (atan2 con -vy)
+                    vx, vy = self.direccion.vector
+                    angle_deg = math.degrees(math.atan2(-vy, vx))
+                    self.imagen = pygame.transform.rotate(self.base_image, angle_deg)
+
+                # reconstruir rect y restaurar centro para evitar "saltos"
                 self.rect = self.imagen.get_rect()
-                self.rect.topleft = topleft
+                self.rect.center = center
 
         self.rect.x += dx
         self.rect.y += dy

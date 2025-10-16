@@ -10,6 +10,15 @@ class Jugador:
         self.base_image = pygame.transform.scale(imagen_original, (64, 64))
         self.imagen = self.base_image
 
+        # imágenes que guardan la última diagonal para N y S y su dirección origen
+        self.last_diag_north_img = self.base_image.copy()
+        self.last_diag_south_img = self.base_image.copy()
+        self.last_diag_north_dir = None   # Direccion.NE o Direccion.NW
+        self.last_diag_south_dir = None   # Direccion.SE o Direccion.SW
+
+        # última orientación horizontal conocida (Direccion.E o Direccion.W)
+        self.last_horizontal_dir = Direccion.E
+
         self.nombre = nombre     
         self.vida = 100 #vida inicial
         self.velocidad = 2
@@ -18,6 +27,12 @@ class Jugador:
 
         self.rect = self.imagen.get_rect()
         self.rect.topleft = self.posicion
+
+    def _diag_is_east(self, d):
+        return d in (Direccion.NE, Direccion.SE)
+
+    def _diag_is_west(self, d):
+        return d in (Direccion.NW, Direccion.SW)
 
     def mover(self, dx, dy):
         # Actualiza dirección según movimiento horizontal/vertical usando el enum
@@ -40,29 +55,89 @@ class Jugador:
             new_dir = mapping.get((sx, sy), self.direccion)
             if new_dir != self.direccion:
                 # actualizar direccion y rotar/transformar imagen según la nueva dirección
-                # NOTA: Norte y Sur deben conservar la última transformación visual.
                 center = self.rect.center
                 self.direccion = new_dir
 
-                if self.direccion in (Direccion.N, Direccion.S):
-                    # mantener self.imagen tal como estaba (conservar última rotación)
-                    pass
+                # Si la nueva dirección es horizontal pura, actualizar last_horizontal_dir
+                if self.direccion == Direccion.E:
+                    self.last_horizontal_dir = Direccion.E
+                    # Este: imagen base rotada 0°
+                    self.imagen = self.base_image
                 elif self.direccion == Direccion.W:
+                    self.last_horizontal_dir = Direccion.W
                     # Oeste: flip horizontal de la base
                     self.imagen = pygame.transform.flip(self.base_image, True, False)
+                elif self.direccion in (Direccion.NE, Direccion.SE):
+                    # NE / SE: rotación igual que en proyectil (imagen orientada a ESTE)
+                    vx, vy = self.direccion.vector
+                    angle_deg = math.degrees(math.atan2(-vy, vx))
+                    img = pygame.transform.rotate(self.base_image, angle_deg)
+                    self.imagen = img
+                    # guardar como última diagonal correspondiente y su dirección
+                    if self.direccion == Direccion.NE:
+                        self.last_diag_north_img = img.copy()
+                        self.last_diag_north_dir = Direccion.NE
+                    else:
+                        self.last_diag_south_img = img.copy()
+                        self.last_diag_south_dir = Direccion.SE
+                    # diagonales NE/SE implican orientación horizontal ESTE
+                    self.last_horizontal_dir = Direccion.E
                 elif self.direccion in (Direccion.NW, Direccion.SW):
-                    # Noroeste / Suroeste: primero flip horizontal la base (para mirar oeste),
-                    # luego rotar esa imagen para inclinarla hacia la diagonal correcta.
+                    # Noroeste / Suroeste: flip + rotación para inclinar hacia la diagonal oeste
                     vx, vy = self.direccion.vector
                     angle_deg = math.degrees(math.atan2(-vy, vx))
                     flipped_base = pygame.transform.flip(self.base_image, True, False)
-                    # restar 180° de la rotación calculada (porque partimos de la imagen volteada)
-                    self.imagen = pygame.transform.rotate(flipped_base, angle_deg - 180)
+                    img = pygame.transform.rotate(flipped_base, angle_deg - 180)
+                    self.imagen = img
+                    # guardar como última diagonal correspondiente y su dirección
+                    if self.direccion == Direccion.NW:
+                        self.last_diag_north_img = img.copy()
+                        self.last_diag_north_dir = Direccion.NW
+                    else:
+                        self.last_diag_south_img = img.copy()
+                        self.last_diag_south_dir = Direccion.SW
+                    # diagonales NW/SW implican orientación horizontal OESTE
+                    self.last_horizontal_dir = Direccion.W
+                elif self.direccion == Direccion.N:
+                    # Norte: tomar la última diagonal norte almacenada y ajustar +/−45°
+                    img = self.last_diag_north_img.copy()
+                    if self.last_diag_north_dir == Direccion.NW:
+                        img = pygame.transform.rotate(img, -45)
+                    elif self.last_diag_north_dir == Direccion.NE:
+                        img = pygame.transform.rotate(img, 45)
+                    # además tener en cuenta la última orientación horizontal (E/W)
+                    if self.last_diag_north_dir is not None:
+                        # Si la última horizontal conocida difiere de la horizontal del origen diagonal, flipear
+                        if self.last_horizontal_dir == Direccion.W and self._diag_is_east(self.last_diag_north_dir):
+                            img = pygame.transform.flip(img, True, False)
+                        if self.last_horizontal_dir == Direccion.E and self._diag_is_west(self.last_diag_north_dir):
+                            img = pygame.transform.flip(img, True, False)
+                    else:
+                        # si no hay diagonal conocida, aplicar flip según last_horizontal_dir sobre base
+                        if self.last_horizontal_dir == Direccion.W:
+                            img = pygame.transform.flip(img, True, False)
+                    self.imagen = img
+                elif self.direccion == Direccion.S:
+                    # Sur: tomar la última diagonal sur almacenada y ajustar +/−45°
+                    img = self.last_diag_south_img.copy()
+                    # CORRECCIÓN: SW -> +45°, SE -> -45°
+                    if self.last_diag_south_dir == Direccion.SW:
+                        img = pygame.transform.rotate(img, 45)
+                    elif self.last_diag_south_dir == Direccion.SE:
+                        img = pygame.transform.rotate(img, -45)
+                    # tener en cuenta la última orientación horizontal (E/W)
+                    if self.last_diag_south_dir is not None:
+                        if self.last_horizontal_dir == Direccion.W and self._diag_is_east(self.last_diag_south_dir):
+                            img = pygame.transform.flip(img, True, False)
+                        if self.last_horizontal_dir == Direccion.E and self._diag_is_west(self.last_diag_south_dir):
+                            img = pygame.transform.flip(img, True, False)
+                    else:
+                        if self.last_horizontal_dir == Direccion.W:
+                            img = pygame.transform.flip(img, True, False)
+                    self.imagen = img
                 else:
-                    # Este, NE y SE: rotación igual que en proyectil (atan2 con -vy)
-                    vx, vy = self.direccion.vector
-                    angle_deg = math.degrees(math.atan2(-vy, vx))
-                    self.imagen = pygame.transform.rotate(self.base_image, angle_deg)
+                    # Por seguridad: dejar base
+                    self.imagen = self.base_image
 
                 # reconstruir rect y restaurar centro para evitar "saltos"
                 self.rect = self.imagen.get_rect()

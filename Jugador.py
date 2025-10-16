@@ -11,12 +11,22 @@ class Jugador:
         self.imagen = self.base_image
 
         # imágenes que guardan la última diagonal para N y S y su dirección origen
-        self.last_diag_north_img = self.base_image.copy()
-        self.last_diag_south_img = self.base_image.copy()
-        self.last_diag_north_dir = None   # Direccion.NE o Direccion.NW
-        self.last_diag_south_dir = None   # Direccion.SE o Direccion.SW
+        # Inicializar por defecto como si las últimas orientaciones hubieran sido NE, E y SE
+        # (se crean las imágenes rotadas correspondientes)
+        vx, vy = Direccion.NE.vector
+        angle_ne = math.degrees(math.atan2(-vy, vx))
+        img_ne = pygame.transform.rotate(self.base_image, angle_ne)
 
-        # última orientación horizontal conocida (Direccion.E o Direccion.W)
+        vx, vy = Direccion.SE.vector
+        angle_se = math.degrees(math.atan2(-vy, vx))
+        img_se = pygame.transform.rotate(self.base_image, angle_se)
+
+        self.last_diag_north_img = img_ne.copy()
+        self.last_diag_north_dir = Direccion.NE
+        self.last_diag_south_img = img_se.copy()
+        self.last_diag_south_dir = Direccion.SE
+
+        # última orientación horizontal conocida (Direccion.E o Direccion.W) — por defecto ESTE
         self.last_horizontal_dir = Direccion.E
 
         self.nombre = nombre     

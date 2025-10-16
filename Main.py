@@ -36,9 +36,10 @@ try:
 except ImportError:
     modo_juego = "uno"
 
-# Crear jugadores
-jugador1 = Jugador.Jugador("Gatito")
-jugador2 = Jugador.Jugador("Perrito") if modo_juego == "dos" else None
+# Crear jugadores (misma altura para ambos)
+shared_y = SCREEN_HEIGHT - 150  # puedes cambiar a SCREEN_HEIGHT//2 u otra constante
+jugador1 = Jugador.Jugador("Gatito", posicion=(100, shared_y))
+jugador2 = Jugador.Jugador("Perrito", posicion=(SCREEN_WIDTH - 150, shared_y), invertido=True) if modo_juego == "dos" else None
 
 # Lista de proyectiles
 proyectiles = []

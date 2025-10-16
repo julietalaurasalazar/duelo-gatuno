@@ -4,15 +4,15 @@ from direccion import Direccion
 import math
 
 class Jugador:
-    def __init__(self, nombre):
+    def __init__(self, nombre, posicion=(100, 100),invertido=False):
         imagen_original = pygame.image.load("player.png")
         # Guardar imagen base orientada hacia la derecha (ESTE)
         self.base_image = pygame.transform.scale(imagen_original, (64, 64))
+        # imagen actualmente mostrada (se ajusta según invertido)
         self.imagen = self.base_image
 
         # imágenes que guardan la última diagonal para N y S y su dirección origen
-        # Inicializar por defecto como si las últimas orientaciones hubieran sido NE, E y SE
-        # (se crean las imágenes rotadas correspondientes)
+        # Inicializar por defecto como si las últimas orientaciones hubieran sido NE y SE
         vx, vy = Direccion.NE.vector
         angle_ne = math.degrees(math.atan2(-vy, vx))
         img_ne = pygame.transform.rotate(self.base_image, angle_ne)
@@ -21,19 +21,31 @@ class Jugador:
         angle_se = math.degrees(math.atan2(-vy, vx))
         img_se = pygame.transform.rotate(self.base_image, angle_se)
 
-        self.last_diag_north_img = img_ne.copy()
-        self.last_diag_north_dir = Direccion.NE
-        self.last_diag_south_img = img_se.copy()
-        self.last_diag_south_dir = Direccion.SE
+        # Si está invertido, flippear las imágenes iniciales para que apunten hacia el oeste
+        if invertido:
+            img_ne = pygame.transform.flip(img_ne, True, False)
+            img_se = pygame.transform.flip(img_se, True, False)
+            # la imagen inicial debe mostrarse hacia el oeste
+            self.imagen = pygame.transform.flip(self.base_image, True, False)
+        else:
+            self.imagen = self.base_image
 
-        # última orientación horizontal conocida (Direccion.E o Direccion.W) — por defecto ESTE
-        self.last_horizontal_dir = Direccion.E
+        # Guardar imágenes diagonales y direcciones origen coherentes con invertido
+        self.last_diag_north_img = img_ne.copy()
+        self.last_diag_north_dir = Direccion.NE if not invertido else Direccion.NW
+        self.last_diag_south_img = img_se.copy()
+        self.last_diag_south_dir = Direccion.SE if not invertido else Direccion.SW
+
+        # última orientación horizontal conocida (Direccion.E o Direccion.W)
+        self.last_horizontal_dir = Direccion.E if not invertido else Direccion.W
 
         self.nombre = nombre     
         self.vida = 100 #vida inicial
         self.velocidad = 2
-        self.posicion = [100, 100]  # Posición inicial
-        self.direccion = Direccion.E  # usar enum de direcciones
+        # usar la posición pasada al constructor (convertir a lista para mutabilidad)
+        self.posicion = [int(posicion[0]), int(posicion[1])]
+        # Dirección inicial según invertido
+        self.direccion = Direccion.W if invertido else Direccion.E
 
         self.rect = self.imagen.get_rect()
         self.rect.topleft = self.posicion

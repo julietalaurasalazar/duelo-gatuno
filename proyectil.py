@@ -3,12 +3,13 @@ import math
 from direccion import Direccion
 
 class Proyectil:
-    def __init__(self, x, y, direccion):
+    def __init__(self, x, y, direccion, owner=None):
         imagen_original = pygame.image.load("proyectil.png")
         # imagen base orientada hacia el ESTE (x positivo)
         self.base_image = pygame.transform.scale(imagen_original, (32, 32))
         self.velocidad = 10
         self.posicion = [float(x), float(y)]
+        self.owner = owner
 
         # direccion preferiblemente es una instancia de Direccion
         if isinstance(direccion, Direccion):

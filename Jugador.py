@@ -60,10 +60,22 @@ class Jugador:
     def mostrar(self, screen):
         screen.blit(self.imagen, self.rect)
 
+    def aplicar_impulso(self, vector, fuerza):
+        # vector puede ser tupla (vx, vy) con valores -1,0,1 (o cualquier otro)
+        try:
+            vx, vy = vector
+        except Exception:
+            vx, vy = (0, 0)
+        # aplicar desplazamiento instantáneo (knockback)
+        self.rect.x += int(vx * fuerza)
+        self.rect.y += int(vy * fuerza)
+        # sincronizar posicion
+        self.posicion = [self.rect.x, self.rect.y]
+
     def lanzar_proyectil(self):
-        # Crea un proyectil desde el centro del jugador, pasando la enum Direccion
+        # Crea un proyectil desde el centro del jugador, pasando la enum Direccion y el owner (self)
         x = self.rect.centerx
         y = self.rect.centery
-        return proyectil.Proyectil(x, y, self.direccion)
+        return proyectil.Proyectil(x, y, self.direccion, owner=self)
 
 

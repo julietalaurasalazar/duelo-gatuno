@@ -150,12 +150,9 @@ while running:
             if getattr(p, "owner", None) is t:
                 continue
             if p.rect.colliderect(t.rect):
-                # aplicar knockback y daño
+                # aplicar solo knockback (sin daño)
                 knockback_force = 30  # ajustar según convenga
                 t.aplicar_impulso(p.vector, knockback_force)
-                t.vida -= 10
-                if t.vida < 0:
-                    t.vida = 0
                 # eliminar proyectil después del impacto
                 if p in proyectiles:
                     proyectiles.remove(p)

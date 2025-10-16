@@ -11,6 +11,12 @@ SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Inicio del juego")
 
+# Cargar sonidos
+sonido_disparo = pygame.mixer.Sound("sonido-disparo.aif")
+sonido_pierde_vida = pygame.mixer.Sound("sonido-baja-vida.wav")
+sonido_disparo.set_volume(0.2)
+sonido_pierde_vida.set_volume(0.2)
+
 # Cargar imagen de fondo
 background_image = pygame.image.load("background.jpg").convert()
 background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -29,7 +35,13 @@ last_shrink_time = pygame.time.get_ticks()
 # Reloj para controlar FPS
 clock = pygame.time.Clock()
 
-# Mostrar menú
+# ----------MOSTRAR MENÚ--------------
+
+# Música menú
+pygame.mixer.music.load("musica-menu.wav")
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.play(-1)  # Loop música menú
+
 try:
     import menu
     modo_juego = menu.mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -38,8 +50,8 @@ except ImportError:
 
 # Crear jugadores (misma altura para ambos)
 shared_y = SCREEN_HEIGHT - 150  # puedes cambiar a SCREEN_HEIGHT//2 u otra constante
-jugador1 = Jugador.Jugador("Gatito", posicion=(100, shared_y))
-jugador2 = Jugador.Jugador("Perrito", posicion=(SCREEN_WIDTH - 150, shared_y), invertido=True) if modo_juego == "dos" else None
+jugador1 = Jugador.Jugador("Gatito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(100, shared_y), invertido=False)
+jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(SCREEN_WIDTH - 150, shared_y), invertido=True) if modo_juego == "dos" else None
 
 # Lista de proyectiles
 proyectiles = []
@@ -57,10 +69,12 @@ while running:
         # Disparo jugador 1
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             proyectiles.append(jugador1.lanzar_proyectil())
+            sonido_disparo.play()
 
         # Disparo jugador 2
         if jugador2 and event.type == pygame.KEYDOWN and event.key == pygame.K_f:
             proyectiles.append(jugador2.lanzar_proyectil())
+            sonido_disparo.play()
 
     # Dibujar fondo
     screen.blit(background_image, (0, 0))
@@ -156,9 +170,17 @@ while running:
             if p in proyectiles:
                 proyectiles.remove(p)
 
+# ----------FINAL PARTIDA--------------      
+
     # Verificar si algún jugador murió
     for j in [jugador1, jugador2] if jugador2 else [jugador1]:
         if j.vida <= 0:
+            
+            pygame.mixer.music.stop()  # Detener música de partida
+            pygame.mixer.music.load("musica-gameover.wav")
+            pygame.mixer.music.set_volume(0.1)
+            pygame.mixer.music.play()  # Música de game over (una vez)
+
             game_over_font = pygame.font.SysFont(None, 72)
             game_over_text = game_over_font.render("GAME OVER", True, (255, 0, 0))
             screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50))

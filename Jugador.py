@@ -4,7 +4,7 @@ from direccion import Direccion
 import math
 
 class Jugador:
-    def __init__(self, nombre, posicion=(100, 100),invertido=False):
+    def __init__(self, nombre, screen_width, screen_height, posicion=(100, 100),invertido=False):
         imagen_original = pygame.image.load("player.png")
         # Guardar imagen base orientada hacia la derecha (ESTE)
         self.base_image = pygame.transform.scale(imagen_original, (64, 64))
@@ -42,6 +42,8 @@ class Jugador:
         self.nombre = nombre     
         self.vida = 100 #vida inicial
         self.velocidad = 2
+        self.screen_width = screen_width     
+        self.screen_height = screen_height
         # usar la posición pasada al constructor (convertir a lista para mutabilidad)
         self.posicion = [int(posicion[0]), int(posicion[1])]
         # Dirección inicial según invertido
@@ -57,6 +59,14 @@ class Jugador:
         return d in (Direccion.NW, Direccion.SW)
 
     def mover(self, dx, dy):
+
+        self.rect.x += dx
+        self.rect.y += dy
+
+        # Limitar dentro de la ventana usando los atributos
+        self.rect.x = max(0, min(self.rect.x, self.screen_width - self.rect.width))
+        self.rect.y = max(0, min(self.rect.y, self.screen_height - self.rect.height))
+
         # Actualiza dirección según movimiento horizontal/vertical usando el enum
         if dx != 0 or dy != 0:
             # Normalizar a signos (-1, 0, 1)

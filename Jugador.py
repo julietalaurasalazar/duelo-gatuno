@@ -5,14 +5,17 @@ from direccion import Direccion
 class Jugador:
     def __init__(self, nombre):
         imagen_original = pygame.image.load("player.png")
-        self.imagen = pygame.transform.scale(imagen_original, (64, 64))
+        # Guardar imagen base orientada hacia la derecha (ESTE)
+        self.base_image = pygame.transform.scale(imagen_original, (64, 64))
+        self.imagen = self.base_image
+
         self.nombre = nombre     
         self.vida = 100 #vida inicial
         self.velocidad = 2
         self.posicion = [100, 100]  # Posición inicial
         self.direccion = Direccion.E  # usar enum de direcciones
 
-        self.rect=self.imagen.get_rect()
+        self.rect = self.imagen.get_rect()
         self.rect.topleft = self.posicion
 
     def mover(self, dx, dy):
@@ -33,7 +36,21 @@ class Jugador:
                 (-1, -1): Direccion.NW,
             }
 
-            self.direccion = mapping.get((sx, sy), self.direccion)
+            new_dir = mapping.get((sx, sy), self.direccion)
+            if new_dir != self.direccion:
+                # actualizar direccion y voltear imagen si corresponde
+                self.direccion = new_dir
+                # conservar la posición visual antes de cambiar rect
+                topleft = self.rect.topleft
+                if self.direccion.vector[0] < 0:
+                    # si va hacia la izquierda, invertir horizontalmente
+                    self.imagen = pygame.transform.flip(self.base_image, True, False)
+                else:
+                    # hacia la derecha: imagen normal
+                    self.imagen = self.base_image
+                # reconstruir rect y mantener topleft
+                self.rect = self.imagen.get_rect()
+                self.rect.topleft = topleft
 
         self.rect.x += dx
         self.rect.y += dy

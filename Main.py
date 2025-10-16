@@ -36,9 +36,10 @@ try:
 except ImportError:
     modo_juego = "uno"
 
-# Crear jugadores
-jugador1 = Jugador.Jugador("Gatito")
-jugador2 = Jugador.Jugador("Perrito") if modo_juego == "dos" else None
+# Crear jugadores (misma altura para ambos)
+shared_y = SCREEN_HEIGHT - 150  # puedes cambiar a SCREEN_HEIGHT//2 u otra constante
+jugador1 = Jugador.Jugador("Gatito", posicion=(100, shared_y))
+jugador2 = Jugador.Jugador("Perrito", posicion=(SCREEN_WIDTH - 150, shared_y), invertido=True) if modo_juego == "dos" else None
 
 # Lista de proyectiles
 proyectiles = []
@@ -125,8 +126,35 @@ while running:
     for p in proyectiles[:]:
         p.mover()
         p.mostrar(screen)
-        if p.rect.right < 0 or p.rect.left > SCREEN_WIDTH:
-            proyectiles.remove(p)
+
+        # Colisiones con jugadores (no golpear al owner)
+        targets = [jugador1] + ([jugador2] if jugador2 else [])
+        collided = False
+        for t in targets:
+            if t is None:
+                continue
+            if getattr(p, "owner", None) is t:
+                continue
+            if p.rect.colliderect(t.rect):
+                # aplicar knockback y daño
+                knockback_force = 30  # ajustar según convenga
+                t.aplicar_impulso(p.vector, knockback_force)
+                t.vida -= 10
+                if t.vida < 0:
+                    t.vida = 0
+                # eliminar proyectil después del impacto
+                if p in proyectiles:
+                    proyectiles.remove(p)
+                collided = True
+                break
+
+        if collided:
+            continue
+
+        # Eliminar proyectil fuera de pantalla
+        if p.rect.right < 0 or p.rect.left > SCREEN_WIDTH or p.rect.bottom < 0 or p.rect.top > SCREEN_HEIGHT:
+            if p in proyectiles:
+                proyectiles.remove(p)
 
     # Verificar si algún jugador murió
     for j in [jugador1, jugador2] if jugador2 else [jugador1]:

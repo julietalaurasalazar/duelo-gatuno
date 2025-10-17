@@ -219,7 +219,7 @@ def jugar(modo_juego):
         pygame.display.update()
         clock.tick(60)
 
-# 🔁 Bucle principal del programa
+# Bucle principal del programa
 while True:
     pygame.mixer.music.load("musica-menu.wav")
     pygame.mixer.music.set_volume(0.1)

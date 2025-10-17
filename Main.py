@@ -111,6 +111,16 @@ def jugar(modo_juego):
                 if nuevo_proyectil: # Sólo añade y reproduce sonido si NO está en cooldown
                     proyectiles.append(nuevo_proyectil)
                     sonido_disparo.play()
+            
+            #  LÓGICA DE DASH 
+            # Jugador 1: Usará la tecla SHIFT DERECHO (Right Shift) para el Dash
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                jugador1.usar_dash()
+                # Opcional: puedes añadir un sonido de dash aquí si tienes uno.
+
+            # Jugador 2: Usará la tecla TABULADOR (Tab) para el Dash
+            if jugador2 and event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                jugador2.usar_dash()
 
         screen.blit(background_image, (0, 0))
         keys = pygame.key.get_pressed()

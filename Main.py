@@ -6,9 +6,8 @@ import Jugador
 pygame.init()
 
 # Dimensiones de la ventana
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_size()
 pygame.display.set_caption("Inicio del juego")
 
 # Cargar sonidos
@@ -36,10 +35,12 @@ def jugar(modo_juego):
     last_shrink_time = pygame.time.get_ticks()
 
     # Crear jugadores
-    jugador1_y = 100  # Más arriba en la pantalla
-    jugador2_y = SCREEN_HEIGHT - 150
-    jugador1 = Jugador.Jugador("Gatito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(100, jugador1_y), invertido=False)
-    jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(SCREEN_WIDTH - 150, jugador2_y), invertido=True) if modo_juego == "dos" else None
+    jugador1_x = SCREEN_WIDTH // 2 - 150  # Izquierda del centro
+    jugador2_x = SCREEN_WIDTH // 2 + 150  # Derecha del centro
+    jugadores_y = SCREEN_HEIGHT // 2      # Ambos a la misma altura
+
+    jugador1 = Jugador.Jugador("Gatito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador1_x, jugadores_y), invertido=False)
+    jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador2_x, jugadores_y), invertido=True) if modo_juego == "dos" else None
 
     proyectiles = []
     pygame.mixer.music.stop()

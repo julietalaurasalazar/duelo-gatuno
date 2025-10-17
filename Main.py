@@ -40,7 +40,7 @@ def dibujar_barra_vida(x, y, vida_actual, nombre):
     fondo_alto = BAR_HEIGHT + TEXT_HEIGHT + 2 * PADDING
 
     # Dibujar fondo marrón con borde negro grueso
-    pygame.draw.rect(screen, (255, 141, 161), (fondo_x, fondo_y, fondo_ancho, fondo_alto))  # Marrón
+    pygame.draw.rect(screen, (139, 69, 19), (fondo_x, fondo_y, fondo_ancho, fondo_alto))  # Marrón
     pygame.draw.rect(screen, (0, 0, 0), (fondo_x, fondo_y, fondo_ancho, fondo_alto), 4)    # Borde negro grueso
 
     # Dibujar barra de fondo gris
@@ -80,13 +80,8 @@ def jugar(modo_juego):
     jugador2_x = SCREEN_WIDTH // 2 + 150  # Derecha del centro
     jugadores_y = SCREEN_HEIGHT // 2      # Ambos a la misma altura
 
-    if modo_juego == "frenetico":
-        # En modo frenético ambos jugadores no tienen cooldown
-        jugador1 = Jugador.Jugador("Gatito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador1_x, jugadores_y), invertido=False, cooldown=False)
-        jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador2_x, jugadores_y), invertido=True, image_path='perrito.png', cooldown=False)
-    else:
-        jugador1 = Jugador.Jugador("Gatito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador1_x, jugadores_y), invertido=False)
-        jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador2_x, jugadores_y), invertido=True,image_path='perrito.png') if modo_juego == "dos" else None
+    jugador1 = Jugador.Jugador("Gatito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador1_x, jugadores_y), invertido=False)
+    jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador2_x, jugadores_y), invertido=True,image_path='perrito.png') if modo_juego == "dos" else None
 
     proyectiles = []
     pygame.mixer.music.stop()
@@ -229,7 +224,7 @@ def jugar(modo_juego):
         pygame.display.update()
         clock.tick(60)
 
-# Bucle principal del programa
+# 🔁 Bucle principal del programa
 while True:
     pygame.mixer.music.load("musica-menu.wav")
     pygame.mixer.music.set_volume(0.1)

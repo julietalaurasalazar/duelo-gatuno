@@ -7,8 +7,19 @@ def mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT):
     font_opcion = pygame.font.SysFont(None, 48)
     opcion_seleccionada = 0  # 0 = Jugar, 1 = Jugar (Frenetico), 2 = Salir
 
+    # Variables para animación vertical
+    deco_base_y = SCREEN_HEIGHT - 400
+    deco_offset = 0
+    deco_direction = 1  # 1 = abajo, -1 = arriba
+    deco_speed = 2      # velocidad de movimiento
+
     while menu_activo:
         screen.fill((0, 0, 0))
+
+        # Animación: rebote suave entre -30 y +30 píxeles
+        deco_offset += deco_direction * deco_speed
+        if deco_offset > 30 or deco_offset < -30:
+            deco_direction *= -1
 
         titulo = font_titulo.render("DUELO ARCOIRIS", True, (255, 141, 161))
         screen.blit(titulo, (SCREEN_WIDTH // 2 - titulo.get_width() // 2, 100))
@@ -29,6 +40,19 @@ def mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT):
         screen.blit(opcion0, (SCREEN_WIDTH // 2 - opcion0.get_width() // 2, 320))
         screen.blit(opcion1, (SCREEN_WIDTH // 2 - opcion1.get_width() // 2, 390))
         screen.blit(opcion2, (SCREEN_WIDTH // 2 - opcion2.get_width() // 2, 460))
+
+        # Personajes decorativos
+        gato_deco = pygame.image.load("player.png").convert_alpha()
+        gato_deco = pygame.transform.scale(gato_deco, (100, 100))
+        perro_deco = pygame.image.load("perrito.png").convert_alpha()
+        perro_deco = pygame.transform.scale(perro_deco, (100, 100))
+        perro_deco = pygame.transform.flip(perro_deco, True, False)  # Voltea horizontalmente
+
+        screen.blit(gato_deco, (100, SCREEN_HEIGHT - 400))
+        screen.blit(perro_deco, (SCREEN_WIDTH - 250, SCREEN_HEIGHT - 400)) 
+
+        pygame.display.update()
+        pygame.time.delay(16)  # ~60 FPS
 
         #instruccion = font_opcion.render("Usa ↑ ↓ y ENTER para elegir", True, (200, 200, 200))
         #screen.blit(instruccion, (SCREEN_WIDTH // 2 - instruccion.get_width() // 2, 500))

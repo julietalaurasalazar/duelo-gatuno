@@ -26,6 +26,37 @@ area_image = pygame.image.load("area.png").convert_alpha()
 # Reloj para controlar FPS
 clock = pygame.time.Clock()
 
+def dibujar_barra_vida(x, y, vida_actual, color_base, nombre):
+    MAX_VIDA = 100  # Ajustá si tus jugadores tienen otro máximo
+    BAR_WIDTH = 200
+    BAR_HEIGHT = 20
+
+    # Fondo gris
+    pygame.draw.rect(screen, (100, 100, 100), (x, y, BAR_WIDTH, BAR_HEIGHT))
+
+    # Vida proporcional
+    vida_proporcional = max(0, min(vida_actual / MAX_VIDA, 1))
+    ancho_vida = int(BAR_WIDTH * vida_proporcional)
+
+    # Color dinámico según nivel de vida
+    if vida_proporcional > 0.6:
+        color = (0, 255, 0)      # Verde
+    elif vida_proporcional > 0.3:
+        color = (255, 165, 0)    # Naranja
+    else:
+        color = (255, 0, 0)      # Rojo
+
+    # Barra de vida
+    pygame.draw.rect(screen, color, (x, y, ancho_vida, BAR_HEIGHT))
+
+    # Borde negro
+    pygame.draw.rect(screen, (0, 0, 0), (x, y, BAR_WIDTH, BAR_HEIGHT), 2)
+
+    # Texto del nombre
+    font = pygame.font.SysFont(None, 28)
+    texto = font.render(nombre, True, (255, 255, 255))
+    screen.blit(texto, (x, y - 25))
+
 # Función principal del juego
 def jugar(modo_juego):
     # Radio inicial del área
@@ -166,12 +197,9 @@ def jugar(modo_juego):
                 running = False
                 break
 
-        font = pygame.font.SysFont(None, 36)
-        vida1 = font.render(f"Vida Gatito: {jugador1.vida}", True, (255, 0, 0))
-        screen.blit(vida1, (20, 20))
+        dibujar_barra_vida(20, 20, jugador1.vida, (255, 0, 0), "Gatito")
         if jugador2:
-            vida2 = font.render(f"Vida Perrito: {jugador2.vida}", True, (0, 0, 255))
-            screen.blit(vida2, (SCREEN_WIDTH - vida2.get_width() - 20, 20))
+            dibujar_barra_vida(SCREEN_WIDTH - 220, 20, jugador2.vida, (0, 0, 255), "Perrito")
 
         pygame.display.update()
         clock.tick(60)

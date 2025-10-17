@@ -40,7 +40,7 @@ def dibujar_barra_vida(x, y, vida_actual, nombre):
     fondo_alto = BAR_HEIGHT + TEXT_HEIGHT + 2 * PADDING
 
     # Dibujar fondo marrón con borde negro grueso
-    pygame.draw.rect(screen, (139, 69, 19), (fondo_x, fondo_y, fondo_ancho, fondo_alto))  # Marrón
+    pygame.draw.rect(screen, (255, 141, 161), (fondo_x, fondo_y, fondo_ancho, fondo_alto))  # Marrón
     pygame.draw.rect(screen, (0, 0, 0), (fondo_x, fondo_y, fondo_ancho, fondo_alto), 4)    # Borde negro grueso
 
     # Dibujar barra de fondo gris

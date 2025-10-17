@@ -17,7 +17,7 @@ sonido_disparo.set_volume(0.2)
 sonido_pierde_vida.set_volume(0.2)
 
 # Cargar imagen de fondo
-background_image = pygame.image.load("background.jpg").convert()
+background_image = pygame.image.load("fondo.jpg").convert()
 background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Cargar imagen del área

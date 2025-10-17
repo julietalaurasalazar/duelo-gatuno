@@ -5,7 +5,7 @@ def mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT):
     menu_activo = True
     font_titulo = pygame.font.SysFont(None, 72)
     font_opcion = pygame.font.SysFont(None, 48)
-    opcion_seleccionada = 1  # 0 = Jugar (Frenetico), 1 = Jugar, 2 = Salir
+    opcion_seleccionada = 0  # 0 = Jugar, 1 = Jugar (Frenetico), 2 = Salir
 
     while menu_activo:
         screen.fill((0, 0, 0))
@@ -21,9 +21,9 @@ def mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT):
         color1 = (255, 255, 0) if opcion_seleccionada == 1 else (255, 255, 255)
         color2 = (255, 255, 0) if opcion_seleccionada == 2 else (255, 255, 255)
 
-        # Opciones
-        opcion0 = font_opcion.render("1. Jugar (Frenetico)", True, color0)
-        opcion1 = font_opcion.render("2. Jugar", True, color1)
+        # Opciones (orden: Jugar, Jugar (Frenetico), Salir)
+        opcion0 = font_opcion.render("1. Jugar", True, color0)
+        opcion1 = font_opcion.render("2. Jugar (Frenetico)", True, color1)
         opcion2 = font_opcion.render("3. Salir", True, color2)
 
         screen.blit(opcion0, (SCREEN_WIDTH // 2 - opcion0.get_width() // 2, 320))
@@ -45,11 +45,11 @@ def mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT):
                 if event.key == pygame.K_DOWN:
                     opcion_seleccionada = min(2, opcion_seleccionada + 1)
                 if event.key == pygame.K_RETURN:
-                    # Devolvemos modos: 'frenetico', 'dos', o salir
+                    # Devolvemos modos: 'dos' -> normal (Jugar), 'frenetico' -> frenético, o salir
                     if opcion_seleccionada == 0:
-                        return "frenetico"
-                    elif opcion_seleccionada == 1:
                         return "dos"
+                    elif opcion_seleccionada == 1:
+                        return "frenetico"
                     elif opcion_seleccionada == 2:
                         pygame.quit()
                         sys.exit()

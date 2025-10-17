@@ -4,7 +4,7 @@ from direccion import Direccion
 import math
 
 class Jugador:
-    def __init__(self, nombre, screen_width, screen_height, posicion=(100, 100), invertido=False, image_path=None):
+    def __init__(self, nombre, screen_width, screen_height, posicion=(100, 100), invertido=False, image_path=None,cooldown=True):
         # Cargar imagen: usar image_path si se pasa, si no usar player.png
         ruta = image_path if image_path is not None else "player.png"
         imagen_original = pygame.image.load(ruta).convert_alpha()
@@ -57,7 +57,7 @@ class Jugador:
 
         # COOLDOWN PARA DISPARO
         self.ultimo_disparo = 0  # Tiempo en milisegundos
-        self.cooldown_disparo = 500  # 0.5 segundos
+        self.cooldown_disparo = 500  if cooldown else 0  # 500 ms de cooldown por defecto
 
     def _diag_is_east(self, d):
         return d in (Direccion.NE, Direccion.SE)

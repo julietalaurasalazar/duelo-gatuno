@@ -4,8 +4,11 @@ from direccion import Direccion
 import math
 
 class Jugador:
-    def __init__(self, nombre, screen_width, screen_height, posicion=(100, 100),invertido=False):
-        imagen_original = pygame.image.load("player.png")
+    def __init__(self, nombre, screen_width, screen_height, posicion=(100, 100), invertido=False, image_path=None):
+        # Cargar imagen: usar image_path si se pasa, si no usar player.png
+        ruta = image_path if image_path is not None else "player.png"
+        imagen_original = pygame.image.load(ruta).convert_alpha()
+
         # Guardar imagen base orientada hacia la derecha (ESTE)
         self.base_image = pygame.transform.scale(imagen_original, (64, 64))
         # imagen actualmente mostrada (se ajusta según invertido)

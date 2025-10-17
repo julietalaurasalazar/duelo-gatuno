@@ -54,12 +54,16 @@ def jugar(modo_juego):
                 sys.exit()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                proyectiles.append(jugador1.lanzar_proyectil())
-                sonido_disparo.play()
-
+                nuevo_proyectil = jugador1.lanzar_proyectil()
+                if nuevo_proyectil: # Sólo añade y reproduce sonido si NO está en cooldown
+                    proyectiles.append(nuevo_proyectil)
+                    sonido_disparo.play()
+            
             if jugador2 and event.type == pygame.KEYDOWN and event.key == pygame.K_f:
-                proyectiles.append(jugador2.lanzar_proyectil())
-                sonido_disparo.play()
+                nuevo_proyectil = jugador2.lanzar_proyectil()
+                if nuevo_proyectil: # Sólo añade y reproduce sonido si NO está en cooldown
+                    proyectiles.append(nuevo_proyectil)
+                    sonido_disparo.play()
 
         screen.blit(background_image, (0, 0))
         keys = pygame.key.get_pressed()

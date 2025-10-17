@@ -52,6 +52,10 @@ class Jugador:
         self.rect = self.imagen.get_rect()
         self.rect.topleft = self.posicion
 
+        # COOLDOWN PARA DISPARO
+        self.ultimo_disparo = 0  # Tiempo en milisegundos
+        self.cooldown_disparo = 1500  # 3 segundos
+
     def _diag_is_east(self, d):
         return d in (Direccion.NE, Direccion.SE)
 
@@ -196,9 +200,13 @@ class Jugador:
         self.posicion = [self.rect.x, self.rect.y]
 
     def lanzar_proyectil(self):
-        # Crea un proyectil desde el centro del jugador, pasando la enum Direccion y el owner (self)
-        x = self.rect.centerx
-        y = self.rect.centery
-        return proyectil.Proyectil(x, y, self.direccion, owner=self)
+        tiempo_actual = pygame.time.get_ticks()
+        if tiempo_actual - self.ultimo_disparo >= self.cooldown_disparo:
+            x = self.rect.centerx
+            y = self.rect.centery
+            self.ultimo_disparo = tiempo_actual
+            return proyectil.Proyectil(x, y, self.direccion, owner=self)
+        else:
+            return None  # Todavía en cooldown
 
 

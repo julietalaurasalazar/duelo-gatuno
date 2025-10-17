@@ -17,7 +17,7 @@ sonido_disparo.set_volume(0.2)
 sonido_pierde_vida.set_volume(0.2)
 
 # Cargar imagen de fondo
-background_image = pygame.image.load("background.jpg").convert()
+background_image = pygame.image.load("fondo.jpg").convert()
 background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Cargar imagen del área
@@ -26,36 +26,46 @@ area_image = pygame.image.load("area.png").convert_alpha()
 # Reloj para controlar FPS
 clock = pygame.time.Clock()
 
-def dibujar_barra_vida(x, y, vida_actual, color_base, nombre):
-    MAX_VIDA = 100  # Ajustá si tus jugadores tienen otro máximo
+def dibujar_barra_vida(x, y, vida_actual, nombre):
+    MAX_VIDA = 100
     BAR_WIDTH = 200
     BAR_HEIGHT = 20
+    PADDING = 10  # Espacio alrededor del contenido
+    TEXT_HEIGHT = 25
 
-    # Fondo gris
+    # Calcular dimensiones del recuadro de fondo
+    fondo_x = x - PADDING
+    fondo_y = y - TEXT_HEIGHT - PADDING
+    fondo_ancho = BAR_WIDTH + 2 * PADDING
+    fondo_alto = BAR_HEIGHT + TEXT_HEIGHT + 2 * PADDING
+
+    # Dibujar fondo marrón con borde negro grueso
+    pygame.draw.rect(screen, (139, 69, 19), (fondo_x, fondo_y, fondo_ancho, fondo_alto))  # Marrón
+    pygame.draw.rect(screen, (0, 0, 0), (fondo_x, fondo_y, fondo_ancho, fondo_alto), 4)    # Borde negro grueso
+
+    # Dibujar barra de fondo gris
     pygame.draw.rect(screen, (100, 100, 100), (x, y, BAR_WIDTH, BAR_HEIGHT))
 
-    # Vida proporcional
+    # Calcular vida proporcional
     vida_proporcional = max(0, min(vida_actual / MAX_VIDA, 1))
     ancho_vida = int(BAR_WIDTH * vida_proporcional)
 
-    # Color dinámico según nivel de vida
+    # Color dinámico según vida
     if vida_proporcional > 0.6:
-        color = (0, 255, 0)      # Verde
+        color = (0, 255, 0)
     elif vida_proporcional > 0.3:
-        color = (255, 165, 0)    # Naranja
+        color = (255, 165, 0)
     else:
-        color = (255, 0, 0)      # Rojo
+        color = (255, 0, 0)
 
-    # Barra de vida
+    # Dibujar barra de vida
     pygame.draw.rect(screen, color, (x, y, ancho_vida, BAR_HEIGHT))
-
-    # Borde negro
     pygame.draw.rect(screen, (0, 0, 0), (x, y, BAR_WIDTH, BAR_HEIGHT), 2)
 
-    # Texto del nombre
+    # Dibujar nombre del jugador
     font = pygame.font.SysFont(None, 28)
     texto = font.render(nombre, True, (255, 255, 255))
-    screen.blit(texto, (x, y - 25))
+    screen.blit(texto, (x, y - TEXT_HEIGHT))        
 
 # Función principal del juego
 def jugar(modo_juego):
@@ -202,9 +212,9 @@ def jugar(modo_juego):
                 running = False
                 break
 
-        dibujar_barra_vida(20, 20, jugador1.vida, (255, 0, 0), "Gatito")
+        dibujar_barra_vida(20, 60, jugador1.vida, "Gatito")
         if jugador2:
-            dibujar_barra_vida(SCREEN_WIDTH - 220, 20, jugador2.vida, (0, 0, 255), "Perrito")
+            dibujar_barra_vida(SCREEN_WIDTH - 220, 60, jugador2.vida, "Perrito")
 
         pygame.display.update()
         clock.tick(60)

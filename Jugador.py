@@ -54,7 +54,7 @@ class Jugador:
 
         # COOLDOWN PARA DISPARO
         self.ultimo_disparo = 0  # Tiempo en milisegundos
-        self.cooldown_disparo = 1500  # 3 segundos
+        self.cooldown_disparo = 500  # 0.5 segundos
 
     def _diag_is_east(self, d):
         return d in (Direccion.NE, Direccion.SE)

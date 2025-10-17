@@ -127,7 +127,7 @@ def jugar(modo_juego):
                 if t is None or getattr(p, "owner", None) is t:
                     continue
                 if p.rect.colliderect(t.rect):
-                    t.aplicar_impulso(p.vector, 30)
+                    t.aplicar_impulso(p.vector, 150)
                     if p in proyectiles:
                         proyectiles.remove(p)
                     collided = True

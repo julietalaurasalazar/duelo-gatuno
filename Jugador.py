@@ -41,7 +41,7 @@ class Jugador:
 
         self.nombre = nombre     
         self.vida = 100 #vida inicial
-        self.velocidad = 2
+        self.velocidad = 1
         self.screen_width = screen_width     
         self.screen_height = screen_height
         # usar la posición pasada al constructor (convertir a lista para mutabilidad)

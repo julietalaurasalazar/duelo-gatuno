@@ -146,7 +146,20 @@ def jugar(modo_juego):
                 pygame.mixer.music.play()
                 game_over_font = pygame.font.SysFont(None, 72)
                 game_over_text = game_over_font.render("GAME OVER", True, (255, 0, 0))
-                screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 50))
+                screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 80))
+
+                # Determinar ganador
+                if jugador2 and jugador1.vida <= 0 and jugador2.vida > 0:
+                    ganador = "¡Ganó Perrito!"
+                elif jugador2 and jugador2.vida <= 0 and jugador1.vida > 0:
+                    ganador = "¡Ganó Gatito!"
+                else:
+                    ganador = "¡Empate!"
+
+                ganador_font = pygame.font.SysFont(None, 48)
+                ganador_text = ganador_font.render(ganador, True, (255, 255, 0))
+                screen.blit(ganador_text, (SCREEN_WIDTH // 2 - ganador_text.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
+
                 pygame.display.flip()
                 pygame.time.delay(3000)
                 running = False

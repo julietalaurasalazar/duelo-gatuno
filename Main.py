@@ -70,8 +70,13 @@ def jugar(modo_juego):
     jugador2_x = SCREEN_WIDTH // 2 + 150  # Derecha del centro
     jugadores_y = SCREEN_HEIGHT // 2      # Ambos a la misma altura
 
-    jugador1 = Jugador.Jugador("Gatito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador1_x, jugadores_y), invertido=False)
-    jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador2_x, jugadores_y), invertido=True,image_path='perrito.png') if modo_juego == "dos" else None
+    if modo_juego == "frenetico":
+        # En modo frenético ambos jugadores no tienen cooldown
+        jugador1 = Jugador.Jugador("Gatito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador1_x, jugadores_y), invertido=False, cooldown=False)
+        jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador2_x, jugadores_y), invertido=True, image_path='perrito.png', cooldown=False)
+    else:
+        jugador1 = Jugador.Jugador("Gatito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador1_x, jugadores_y), invertido=False)
+        jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador2_x, jugadores_y), invertido=True,image_path='perrito.png') if modo_juego == "dos" else None
 
     proyectiles = []
     pygame.mixer.music.stop()

@@ -13,8 +13,15 @@ pygame.display.set_caption("Inicio del juego")
 # Cargar sonidos
 sonido_disparo = pygame.mixer.Sound("sonido-disparo.aif")
 sonido_pierde_vida = pygame.mixer.Sound("sonido-baja-vida.wav")
+sonido_maullido = pygame.mixer.Sound("gatito-maulla.ogg")
+sonido_ladrido = pygame.mixer.Sound("perrito-ladra.wav")
+sonido_splash = pygame.mixer.Sound("splash.wav")
+
 sonido_disparo.set_volume(0.2)
 sonido_pierde_vida.set_volume(0.2)
+sonido_maullido.set_volume(0.3)
+sonido_ladrido.set_volume(0.3)
+sonido_splash.set_volume(0.4)
 
 # Cargar imagen de fondo
 background_image = pygame.image.load("fondo.jpg").convert()
@@ -40,7 +47,7 @@ def dibujar_barra_vida(x, y, vida_actual, nombre):
     fondo_alto = BAR_HEIGHT + TEXT_HEIGHT + 2 * PADDING
 
     # Dibujar fondo marrón con borde negro grueso
-    pygame.draw.rect(screen, (255, 141, 161), (fondo_x, fondo_y, fondo_ancho, fondo_alto))  # Marrón
+    pygame.draw.rect(screen, (139, 69, 19), (fondo_x, fondo_y, fondo_ancho, fondo_alto))  # Marrón
     pygame.draw.rect(screen, (0, 0, 0), (fondo_x, fondo_y, fondo_ancho, fondo_alto), 4)    # Borde negro grueso
 
     # Dibujar barra de fondo gris
@@ -69,6 +76,12 @@ def dibujar_barra_vida(x, y, vida_actual, nombre):
 
 # Función principal del juego
 def jugar(modo_juego):
+
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load("musica-juego.wav")
+    pygame.mixer.music.set_volume(0.1)
+    pygame.mixer.music.play(-1)
+    
     # Radio inicial del área
     max_radius = min(SCREEN_WIDTH, SCREEN_HEIGHT)
     radius = float(max_radius / 1.5)
@@ -89,7 +102,6 @@ def jugar(modo_juego):
         jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador2_x, jugadores_y), invertido=True,image_path='perrito.png') if modo_juego == "dos" else None
 
     proyectiles = []
-    pygame.mixer.music.stop()
 
     running = True
     while running:
@@ -156,6 +168,8 @@ def jugar(modo_juego):
             distancia = ((centro[0] - centro_area[0])**2 + (centro[1] - centro_area[1])**2)**0.5
             if distancia > radius:
                 j.vida -= 1
+                sonido_splash.play()
+                sonido_maullido.play(loops=3) if j.nombre == "Gatito" else sonido_ladrido.play(loops=3)
                 if j.vida < 0:
                     j.vida = 0
 
@@ -229,7 +243,7 @@ def jugar(modo_juego):
         pygame.display.update()
         clock.tick(60)
 
-# Bucle principal del programa
+# 🔁 Bucle principal del programa
 while True:
     pygame.mixer.music.load("musica-menu.wav")
     pygame.mixer.music.set_volume(0.1)

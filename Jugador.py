@@ -222,26 +222,24 @@ class Jugador:
         
         # 1. Verificar el cooldown
         if tiempo_actual - self.ultimo_dash >= self.cooldown_dash:
-            
-            # Obtener el vector de dirección normalizado (-1, 0, 1)
-            vx_norm, vy_norm = self.direccion.vector
-            
-            # 2. Calcular el desplazamiento total (vector * distancia)
-            # El impulso se aplica en la dirección guardada
-            dx = vx_norm * self.distancia_dash
-            dy = vy_norm * self.distancia_dash
-            
-            # Si el movimiento es diagonal, el impulso es mayor para que el dash sea de 100 unidades
-            # en la distancia total (hipotenusa). Multiplicamos por la raíz cuadrada de 2.
-            if vx_norm != 0 and vy_norm != 0:
-                factor = math.sqrt(2) # Ajuste para que la hipotenusa sea la distancia_dash
-                dx *= factor
-                dy *= factor
+            # Obtener el vector de dirección (puede ser -1,0,1)
+            vx, vy = self.direccion.vector
 
-            # 3. Aplicar el movimiento
-            # Uso la misma lógica de mover/aplicar_impulso para desplazar el rect
-            self.rect.x += int(dx)
-            self.rect.y += int(dy)
+            # Normalizar el vector para obtener la dirección unitaria
+            mag = math.hypot(vx, vy)
+            if mag == 0:
+                # Si no hay dirección (caso borde), no hacer dash
+                return False
+            ux = vx / mag
+            uy = vy / mag
+
+            # Desplazamiento total = vector unitario * distancia_dash
+            dx = ux * self.distancia_dash
+            dy = uy * self.distancia_dash
+
+            # 3. Aplicar el movimiento (convertir a int)
+            self.rect.x += int(round(dx))
+            self.rect.y += int(round(dy))
 
             # 4. Limitar el movimiento dentro de la pantalla (igual que en mover)
             self.rect.x = max(0, min(self.rect.x, self.screen_width - self.rect.width))

@@ -61,7 +61,7 @@ class Jugador:
 
         # COOLDOWN PARA DASH (NUEVO)
         self.ultimo_dash = 0 # Tiempo en milisegundos
-        self.cooldown_dash = 1000 # 1000 ms (1 segundo) de cooldown
+        self.cooldown_dash = 1000 if cooldown else 0  # 1000 ms de cooldown por defecto
         self.distancia_dash = 100 # Distancia extra del dash
     
     def _diag_is_east(self, d):

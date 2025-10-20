@@ -42,9 +42,9 @@ def mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT):
 
         # Instrucciones
         gato_controles = pygame.image.load("player1-comandos.png").convert_alpha()
-        gato_controles = pygame.transform.scale(gato_controles, (300, 200))
+        gato_controles = pygame.transform.scale(gato_controles, (200, 100))
         perro_controles = pygame.image.load("player2-comandos.png").convert_alpha()
-        perro_controles = pygame.transform.scale(perro_controles, (300, 200))
+        perro_controles = pygame.transform.scale(perro_controles, (200, 100))
 
         screen.blit(gato_controles, (100, SCREEN_HEIGHT - 300))
         screen.blit(perro_controles, (SCREEN_WIDTH - 250, SCREEN_HEIGHT - 300))

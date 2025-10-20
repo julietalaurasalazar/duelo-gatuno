@@ -33,6 +33,7 @@ area_image = pygame.image.load("area.png").convert_alpha()
 # Reloj para controlar FPS
 clock = pygame.time.Clock()
 
+# Dibujar vida
 def dibujar_barra_vida(x, y, vida_actual, nombre):
     MAX_VIDA = 100
     BAR_WIDTH = 200
@@ -89,6 +90,7 @@ def jugar(modo_juego):
     last_shrink_time = pygame.time.get_ticks()
 
     # Crear jugadores
+        # SETEO DE COORDENADAS 
     jugador1_x = SCREEN_WIDTH // 2 - 150  # Izquierda del centro
     jugador2_x = SCREEN_WIDTH // 2 + 150  # Derecha del centro
     jugadores_y = SCREEN_HEIGHT // 2      # Ambos a la misma altura
@@ -102,35 +104,30 @@ def jugar(modo_juego):
         jugador2 = Jugador.Jugador("Perrito", SCREEN_WIDTH, SCREEN_HEIGHT, posicion=(jugador2_x, jugadores_y), invertido=True,image_path='perrito.png') if modo_juego == "dos" else None
 
     proyectiles = []
-
     running = True
     while running:
         current_time = pygame.time.get_ticks()
 
+        # Configuracion de CONTROLES en juego
         for event in pygame.event.get():
+            #CIERRE FORZADO
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-
+            #DISPARO
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 nuevo_proyectil = jugador1.lanzar_proyectil()
                 if nuevo_proyectil: # Sólo añade y reproduce sonido si NO está en cooldown
                     proyectiles.append(nuevo_proyectil)
                     sonido_disparo.play()
-            
             if jugador2 and event.type == pygame.KEYDOWN and event.key == pygame.K_f:
                 nuevo_proyectil = jugador2.lanzar_proyectil()
                 if nuevo_proyectil: # Sólo añade y reproduce sonido si NO está en cooldown
                     proyectiles.append(nuevo_proyectil)
                     sonido_disparo.play()
-            
-            #  LÓGICA DE DASH 
-            # Jugador 1: Usará la tecla SHIFT DERECHO (Right Shift) para el Dash
+            #DASH 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
                 jugador1.usar_dash()
-                # Opcional: puedes añadir un sonido de dash aquí si tienes uno.
-
-            # Jugador 2: Usará la tecla TABULADOR (Tab) para el Dash
             if jugador2 and event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                 jugador2.usar_dash()
 
@@ -162,22 +159,23 @@ def jugar(modo_juego):
                 dy2 = dy2 / mag2 * jugador2.velocidad
             jugador2.mover(dx2, dy2)
 
+        # AREA SEGURA EN RELACION CON EL JUGADOR 
         centro_area = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         for j in [jugador1, jugador2] if jugador2 else [jugador1]:
             centro = j.rect.center
             distancia = ((centro[0] - centro_area[0])**2 + (centro[1] - centro_area[1])**2)**0.5
+            # PENALIZACION SI ESTA FUERA DEL AREA
             if distancia > radius:
                 j.vida -= 1
                 sonido_splash.play()
                 sonido_maullido.play(loops=3) if j.nombre == "Gatito" else sonido_ladrido.play(loops=3)
                 if j.vida < 0:
                     j.vida = 0
-
+        # ACHICAMIENTO DEL AREA X TIEMPO
         if current_time - last_shrink_time >= shrink_interval and radius > 0:
             radius -= 20
             radius = max(radius, 0)
             last_shrink_time = current_time
-
         if radius > 0:
             scaled_area = pygame.transform.scale(area_image, (int(radius * 2), int(radius * 2)))
             x = SCREEN_WIDTH // 2 - int(radius)
@@ -188,6 +186,7 @@ def jugar(modo_juego):
         if jugador2:
             jugador2.mostrar(screen)
 
+        # FUNCIONAMIENTO DE LA COLISION
         for p in proyectiles[:]:
             p.mover()
             p.mostrar(screen)

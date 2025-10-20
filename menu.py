@@ -8,7 +8,6 @@ def mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT):
     opcion_seleccionada = 0  # 0 = Jugar, 1 = Jugar (Frenetico), 2 = Salir
 
     # Variables para animación vertical
-    deco_base_y = SCREEN_HEIGHT - 400
     deco_offset = 0
     deco_direction = 1  # 1 = abajo, -1 = arriba
     deco_speed = 2      # velocidad de movimiento
@@ -43,9 +42,9 @@ def mostrar_menu(screen, SCREEN_WIDTH, SCREEN_HEIGHT):
 
         # Instrucciones
         gato_controles = pygame.image.load("player1-comandos.png").convert_alpha()
-        gato_controles = pygame.transform.scale(gato_controles, (100, 100))
+        gato_controles = pygame.transform.scale(gato_controles, (300, 200))
         perro_controles = pygame.image.load("player2-comandos.png").convert_alpha()
-        perro_controles = pygame.transform.scale(perro_controles, (100, 100))
+        perro_controles = pygame.transform.scale(perro_controles, (300, 200))
 
         screen.blit(gato_controles, (100, SCREEN_HEIGHT - 300))
         screen.blit(perro_controles, (SCREEN_WIDTH - 250, SCREEN_HEIGHT - 300))
